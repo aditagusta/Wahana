@@ -1,19 +1,19 @@
 @extends('layouts.main')
-@section('title') Operator @endsection
+@section('title') Wahana @endsection
 @section('heading')
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Operator</h1>
+    <h1 class="h3 mb-0 text-gray-800">Wahana</h1>
 </div>
 @endsection
 @section('content')
 <div class="card shadow mb-4">
     <div class="card-header">
         <div class="">
-            <h6 class="m-0 font-weight-bold text-primary">Laporan Operator</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Laporan Wahana</h6>
             <!-- Custom styles for this page -->
             <link href="{{asset('/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
             <div class="text-left mt-3">
-                <form action="{{ route('report.operator')}}" method="GET">
+                <form action="{{ route('wahana_report')}}" method="GET">
                     <div class="row">
                         <div class="col-md-2">
                             <input type="date" name="date_start" value="{{ app('request')->input('date_start') }}"
@@ -50,19 +50,62 @@
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Tanggal</th>
+                        <th>No</th>
                         <th>Wahana</th>
-                        <th>Operator</th>
+                        <th>Petugas Loket</th>
+                        <th>Petugas Operator</th>
                     </tr>
                 </thead>
                 <tbody class="hasil">
-                    @foreach ($data as $no => $op)
+                    @foreach ($data as $no => $item)
                     <tr>
                         <td>{{$no +1}}</td>
-                        <td>{{$op->date}}</td>
-                        <td>{{$op->wahana_id}}</td>
-                        <td>{{$op->staff_operator_nik}}</td>
+                        <td>{{$item['wahana_name']}}</td>
+                        <td>
+                            <?php
+
+                                if(isset($_GET['type'])){
+                                    $sch = DB::table('schedule')
+                                            ->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')
+                                            ->whereBetween('schedule.date', [$_GET['date_start'], $_GET['date_end']])
+                                            ->where('wahana_id', $item['wahana_id'])
+                                            ->get();
+                                }else{
+                                    $sch = DB::table('schedule')
+                                    ->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')
+                                    ->where('wahana_id', $item['wahana_id'])
+                                    ->get();
+                                }
+                            ?>
+
+                            <ul>
+                                @foreach ($sch as $sc)
+                                <li>{{$sc->employee_name}}</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                        <td>
+                            <?php
+                                if(isset($_GET['type']))
+                                {
+                                    $opr = DB::table('staff_operators')
+                                    ->join('employees', 'staff_operators.staff_operator_nik', 'employees.employee_nik')
+                                    ->whereBetween('staff_operators.date', [$_GET['date_start'], $_GET['date_end']])
+                                    ->where('wahana_id', $item['wahana_id'])
+                                    ->get();
+                                } else {
+                                    $opr = DB::table('staff_operators')
+                                    ->join('employees', 'staff_operators.staff_operator_nik', 'employees.employee_nik')
+                                    ->where('wahana_id', $item['wahana_id'])
+                                    ->get();
+                                }
+                            ?>
+                            <ul>
+                                @foreach ($opr as $sc)
+                                <li>{{$sc->employee_name}}</li>
+                                @endforeach
+                            </ul>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

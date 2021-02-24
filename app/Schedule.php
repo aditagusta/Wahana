@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
-    use Traits\CompositeKey;
+    // use Traits\CompositeKey;
     // use CompositeKey;
 
     public $table = 'schedule';

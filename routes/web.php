@@ -33,17 +33,22 @@ Route::resource('visitor', 'VisitorController');
 Route::resource('wahana', 'WahanaController');
 Route::post('/wahana/{id}/update', 'wahanaController@update')->name('wahana.update');
 Route::get('changeStatus', 'WahanaController@changeStatus');
+Route::post('wahana-aktif', 'wahanaController@update_status_aktif');
+Route::post('wahana-nonaktif', 'wahanaController@update_status_nonaktif');
+
 
 //jabatan
 Route::resource('position', 'PositionController');
 
 // schedule
 Route::get('/schedule', 'ScheduleController@index')->name('schedule');
+Route::get('/opr', 'ScheduleController@operator')->name('addopr');
 Route::get('/schedule/add', 'ScheduleController@create')->name('create_schedule');
 Route::post('/schedule/action', 'ScheduleController@store')->name('addschedule');
-Route::get('/deleteschedule/{date?}/{wahana?}/{staff?}', 'ScheduleController@destroy')->name('deleteschedule');
-Route::get('/editschedule/{date?}', 'ScheduleController@edit')->name('editschedule');
-Route::post('/updateschedule/{date}', 'ScheduleController@update')->name('updateschedule');
+Route::get('/deleteschedule/{date?}/{wahana?}', 'ScheduleController@destroy')->name('deleteschedule');
+Route::get('/editschedule/{date?}/{wahana?}', 'ScheduleController@edit')->name('editschedule');
+Route::put('/updateschedule', 'ScheduleController@update')->name('updateschedule');
+Route::post('/addoperator', 'ScheduleController@addoperator')->name('addoperator');
 
 Route::post('/position/{id}/update', 'PositionController@update')->name('position.update');
 
@@ -61,10 +66,10 @@ date_default_timezone_set("ASIA/JAKARTA");
 Route::resource('transaction', 'TransactionController');
 
 // Staff Operators
-Route::get('/so', 'StaffOperatorController@index')->name('so');
-Route::get('/staff/add', 'StaffOperatorController@create')->name('create_so');
-Route::post('/staff/action', 'StaffOperatorController@store')->name('addso');
-Route::get('/deleteso/{date?}/{wahana?}/{staff?}', 'StaffOperatorController@destroy')->name('deleteso');
+// Route::get('/so', 'StaffOperatorController@index')->name('so');
+// Route::get('/staff/add', 'StaffOperatorController@create')->name('create_so');
+// Route::post('/staff/action', 'StaffOperatorController@store')->name('addso');
+// Route::get('/deleteso/{date?}/{wahana?}/{staff?}', 'StaffOperatorController@destroy')->name('deleteso');
 
 
 //Pembayaran
@@ -85,6 +90,8 @@ Route::get('/report/operator', 'ReportController@indexoperator')->name('report.o
 Route::get('/report/operator/print', 'ReportController@indexoperator')->name('report.operator');
 
 Route::get('/report/transaction_report', 'ReportController@transactionindex')->name('report.transaction_report');
+
+Route::get('/report/wahana_report', 'ReportController@indexwahana')->name('wahana_report');
 
 Route::get('/visitor/cetak/qr/{id}', 'VisitorController@cetakqrvisitor')->name('visitor.cetakqr');
 

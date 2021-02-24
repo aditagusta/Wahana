@@ -1,6 +1,8 @@
 @extends('layouts.main')
 @section('title') Dashboard @endsection
 @section('heading')
+
+
 <script type="text/javascript" src="{{ asset('chart.js')}}"></script>
 <script src="{{ asset('randomcolor.min.js') }}"></script>
 <div class="d-sm-flex align-items-center justify-content-between mb-4">

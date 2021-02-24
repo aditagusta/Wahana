@@ -43,7 +43,7 @@
                 <a class="collapse-item" href="{{ url('/employee') }}">Pegawai</a>
                 <a class="collapse-item" href="{{ url('/position') }}">Jabatan</a>
                 <a class="collapse-item" href="{{ url('/schedule') }}">Schedule </a>
-                <a class="collapse-item" href="{{ url('/so') }}">Staff Operators </a>
+                {{-- <a class="collapse-item" href="{{ url('/so') }}">Staff Operators </a> --}}
             </div>
         </div>
     </li>
@@ -87,8 +87,8 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{url('/report/topup')}}">Laporan Top Up</a>
                 <a class="collapse-item" href="{{url('/report/transaction_report')}}">Laporan Transaksi</a>
-                <a class="collapse-item" href="{{url('/report/transaction_report')}}">Laporan Wahana</a>
-                <a class="collapse-item" href="{{route('report.operator')}}">Laporan Operator</a>
+                <a class="collapse-item" href="{{route('wahana_report')}}">Laporan Wahana</a>
+                {{-- <a class="collapse-item" href="{{route('report.operator')}}">Laporan Operator</a> --}}
 
             </div>
     </li>
@@ -149,7 +149,7 @@
         </a>
         <div id="menu_wahana" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{url('/staff-wahana')}}">Staff Wahana</a>
+                <a class="collapse-item" href="{{url('/wahana')}}">Staff Wahana</a>
             </div>
     </li>
     <li class="nav-item">

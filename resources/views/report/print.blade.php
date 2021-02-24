@@ -18,7 +18,7 @@
                     <div class="col-md-8">
                         <center>
                             <br><br>
-                           <h2>Kampung Sarosah</h2>
+                            <h2>Kampung Sarosah</h2>
                             <h5><b>Jorong Lubuak Limpato, Kenagarian Tarantang, Kecamatan Harau</b></h5>
                             <span><span class="fa fa-envelope"></span> Lembah Harau
                                 <span class="fa fa-phone"></span> HP.
@@ -53,10 +53,11 @@
                                 <center>No</center>
                             </th>
                             <th>ID</th>
-                            <th>Tanggal</th><!-- 
+                            <th>Tanggal</th>
+                            <!--
                             <th>Pengunjung</th> -->
                             <th>Jumlah</th>
-                          <!--   <th>Kasir</th> -->
+                            <!--   <th>Kasir</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -70,18 +71,18 @@
                             </th>
                             <td>{{$top->topup_id}}</td>
                             <td>{{$top->topup_date}}</td>
-                          <!--   <td>{{$top->visitor->visitor_name}}</td> -->
+                            <!--   <td>{{$top->visitor->visitor_name}}</td> -->
                             <td>@currency($top->amount)</td>
-                         <!--    <td>{{$top->employee->employee_name}}</td> -->
+                            <!--    <td>{{$top->employee->employee_name}}</td> -->
 
                         </tr>
 
-                         @php
+                        @php
                         $totalkeseluruhan=$totalkeseluruhan+$top->amount;
                         @endphp
                         @endforeach
                     </tbody>
-                     <tfoot>
+                    <tfoot>
                         <tr>
                             <td colspan="3">Total</td>
                             <td>@currency($totalkeseluruhan)</td>
@@ -92,7 +93,7 @@
                     <div class="col-md-4 offset-8 mt-5">
                         Payakumbuh, @php echo date('d F Y') @endphp
                         <br><br><br><br>
-                        <b><u>{{ session()->get('name') }}</u></b>
+                        <b><u>{{ session()->get('employee_name') }}</u></b>
                     </div>
                 </div>
             </div>

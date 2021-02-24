@@ -29,9 +29,9 @@
                 </div>
                 <div class="form-group">
                     <select name="staff" id="" class="form-control">
-                        <option value="">-- Pilih Staff --</option>
-                        @foreach ($staff as $datastaff)
-                        <option value="{{$datastaff->staff_operator_nik}}">{{$datastaff->staff_operator_nik}}</option>
+                        <option value="">-- Pilih Staff Loket --</option>
+                        @foreach ($emp as $dataemp)
+                        <option value="{{$dataemp->employee_nik}}">{{$dataemp->employee_name}}</option>
                         @endforeach
                     </select>
                 </div>

@@ -34,6 +34,7 @@
                         <th>No</th>
                         <th>Tanggal</th>
                         <th>Wahana</th>
+                        <th>Staff Loket</th>
                         <th>Staff Operator</th>
                         <th>Aksi</th>
                     </tr>
@@ -45,16 +46,81 @@
                         <td>{{$item->date}}</td>
                         <td>{{$item->wahana_id}}</td>
                         <td>{{$item->staff_loket_nik}}</td>
-                        <td><a href="{{url('deleteschedule'. "/" . $item->date . "/" . $item->wahana_id . "/" . $item->staff_loket_nik)}}"
+                        <td>
+                            @php
+                            $data_operator = DB::table('staff_operators')->leftJoin('employees',
+                            'staff_operators.staff_operator_nik', 'employees.employee_nik')->where('date',
+                            $item->date)->where('wahana_id', $item->wahana_id)->get();
+                            @endphp
+                            @foreach ($data_operator as $dt)
+                            <li>{{$dt->employee_name}}</li>
+                            @endforeach
+                        </td>
+                        <td>
+                            <a href="{{url('deleteschedule'. "/" . $item->date . "/" . $item->wahana_id)}}"
                                 class="btn btn-sm btn-danger">Hapus</a> |
-                            <a href="{{url('editschedule'. "/" . $item->date)}}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{{url('editschedule'. "/" . $item->date."/" . $item->wahana_id)}}"
+                                class="btn btn-sm btn-warning">Edit</a>
+                            <?php if($item->wahana_id == "WS01")
+                                {
+                            ?>
+                            |
+                            <button type="button" class="btn btn-sm btn-success"
+                                onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
+                            <?php
+                            }elseif ($item->wahana_id == "WS02"){
+                            ?>
+                            |
+                            <button type="button" class="btn btn-sm btn-success"
+                                onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
+                            <?php
+                            }elseif ($item->wahana_id == "WS07"){
+                            ?>
+                            |
+                            <button type="button" class="btn btn-sm btn-success"
+                                onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
+                            <?php
+                            }
+                            ?>
                         </td>
                     </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="opr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{route('addoperator')}}" method="POST">
+                                        @csrf
+                                        <input type="date" id="date" name="date_">
+                                        <input type="text" id="id" name="wahana_">
+                                        <div class="row">
+
+                                            @foreach ($operator as $opr)
+                                            <div class="col-sm-2">
+                                                <input type="checkbox" name="nama[]"
+                                                    value="{{$opr->employee_nik}}">&nbsp&nbsp&nbsp{{$opr->employee_name}}
+                                            </div>
+                                            @endforeach
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success">Simpan</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endforeach
                 </tbody>
 
                 <!-- Bootstrap core JavaScript-->
-                <!--      <script src="{{asset('/vendor/jquery/jquery.min.js')}}"></script> -->
+                <script src="{{asset('/vendor/jquery/jquery.min.js')}}"></script>
                 <script src="{{asset('/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
                 <!-- Core plugin JavaScript-->
                 <script src="{{asset('/vendor/jquery-easing/jquery.easing.min.js')}}"></script>
@@ -65,8 +131,57 @@
                 <script src="{{asset('/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
                 <!-- Page level custom scripts -->
                 <script src="{{asset('/js/demo/datatables-demo.js')}}"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+                    integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+                    crossorigin="anonymous"></script>
+                <script>
+                    function tekan(date,id)
+                    {
+                        $('#date').val(date)
+                        $('#id').val(id)
+                        axios.post("{{url('/api/operator')}}",{
+                            'date':date,
+                            'wahana_id':id
+                        }).then(function(res){
+                            var cek = res.data;
+                            if(cek != ''){
+                                var list_opr = document.getElementsByName("nama[]");
+                                console.log(cek[0].staff_operator_nik);
+                                // console.log(list_opr.length);
+                                // reset centang opr
+                                for (var x = 0; x < list_opr.length; x++) {
+                                    list_opr[x].checked = false;
+                                }
+                                for (var x = 0; x < list_opr.length; x++) {
+                                    for (var i = 0; i < cek.length; i++) {
+                                        console.log(cek[i].staff_operator_nik);
+                                        if (list_opr[x].value == cek[i].staff_operator_nik) {
+                                            list_opr[x].checked = true;
+                                        }
+                                    }
+                                }
+                            }else{
+                                var list_opr = document.getElementsByName("nama[]");
+                                // reset centang opr
+                                for (var x = 0; x < list_opr.length; x++) {
+                                    list_opr[x].checked = false;
+                                }
+                            }
+                            $('#opr').modal()
+                        })
+                    }
+                </script>
             </table>
         </div>
     </div>
+    {{-- axios.post("{{url('/api/operator')}}",{
+    'date':date,
+    'wahana_id':id
+    }).then(function(res){
+    res.data.forEach(isi => {
+    var data = JSON.stringify(isi);
+    console.log(data)
+
+    }); --}}
 </div>
 @endsection

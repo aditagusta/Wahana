@@ -16,11 +16,8 @@ class TransactionController extends Controller
 
     public function index()
     {
-        $dt = DB::table('wahana')
-            ->leftJoin('transactions', 'wahana.wahana_id', 'transactions.wahana_id')
-            ->leftJoin('visitors', 'transactions.visitor_id', 'visitors.visitor_id')
-            ->get();
-        return view('transaction.index', compact('dt'));
+        $transaction = Transaction::all();
+        return view('transaction.index', compact('transaction'));
     }
 
     public function create()

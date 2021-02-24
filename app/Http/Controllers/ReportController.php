@@ -47,10 +47,7 @@ class ReportController extends Controller
     {
         $html_report = "";
 
-        $transaction = DB::table('wahana')
-            ->leftJoin('transactions', 'wahana.wahana_id', 'transactions.wahana_id')
-            ->leftJoin('visitors', 'transactions.visitor_id', 'visitors.visitor_id')
-            ->get();
+        $transaction = Transaction::all();
         $authposition = session()->get('id_position');
         $authname = session()->get('name');
 
@@ -101,36 +98,105 @@ class ReportController extends Controller
             // Output the generated PDF to Browser
             $dompdf->stream("laporan.pdf", array("Attachment" => false));
         } else {
-            $transaction = DB::table('wahana')
-                ->leftJoin('transactions', 'wahana.wahana_id', 'transactions.wahana_id')
-                ->leftJoin('visitors', 'transactions.visitor_id', 'visitors.visitor_id')
-                ->get();
-
+            $transaction = Transaction::get();
             return view('report.transaction_report', compact('transaction', 'authposition', 'authname'));
         }
     }
 
-    public function indexoperator(Request $request)
+    public function indexwahana(Request $request)
     {
         if ($request->type == 'search') {
-            $data = DB::table('staff_operators')->whereBetween(DB::raw('DATE(date)'), [$request->date_start, $request->date_end])->get();
-            return view('report.reportoperator', compact('data'));
+            $wahana = DB::table('wahana')->get();
+            $data = array();
+            $operator = array();
+            foreach ($wahana as $key => $a) {
+                $opr = DB::table('schedule')
+                    ->where('wahana_id', $a->wahana_id)
+                    ->get();
+                foreach ($opr as $key => $b) {
+                    $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
+                    $operator[] = array(
+                        'employee_nik' => $b->staff_loket_nik,
+                        'date' => $b->date
+                    );
+                }
+
+                if (!empty($b->date)) {
+                    $hari = $b->date;
+                } else {
+                    $hari = '';
+                }
+
+                $data[] = array(
+                    'wahana_name' => $a->wahana_name,
+                    'wahana_id' => $a->wahana_id,
+                    'date' => $hari
+                );
+            }
+
+            return view('report.wahana_report', compact('data'));
         } elseif ($request->type == 'print') {
-            $data = DB::table('staff_operators')->whereBetween(DB::raw('DATE(date)'), [$request->date_start, $request->date_end])->get();
-            $html_report = view('report.operatorprint', compact('data'))->render();
-            $dompdf = new Dompdf();
-            $dompdf->loadHtml($html_report);
+            $wahana = DB::table('wahana')->get();
+            $data = array();
+            $operator = array();
+            foreach ($wahana as $key => $a) {
+                $opr = DB::table('schedule')
+                    ->where('wahana_id', $a->wahana_id)
+                    ->whereBetween('date', [$request->date_start, $request->date_end])
+                    ->get();
+                // dd($opr);
+                foreach ($opr as $key => $b) {
+                    $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
+                    // dd($emp);
+                    $operator[] = array(
+                        'employee_nik' => $b->staff_loket_nik,
+                        'date' => $b->date
+                    );
+                }
+                if (!empty($b->date)) {
+                    $hari = $b->date;
+                } else {
+                    $hari = '';
+                }
 
-            // (Optional) Setup the paper size and orientation
-            $dompdf->setPaper('A4', 'portrait');
-
-            // Render the HTML as PDF
-            $dompdf->render();
-
-            // Output the generated PDF to Browser
-            $dompdf->stream("laporan.pdf", array("Attachment" => false));
+                $data[] = array(
+                    'wahana_name' => $a->wahana_name,
+                    'wahana_id' => $a->wahana_id,
+                    'date' => $hari
+                );
+            }
+            return view('report.wahana_print', compact('data'));
         } else {
-            return view('report.reportoperator', compact(['data']));
+            $wahana = DB::table('wahana')->get();
+            $data = array();
+            $operator = array();
+            foreach ($wahana as $key => $a) {
+                $opr = DB::table('schedule')
+                    ->where('wahana_id', $a->wahana_id)
+                    ->whereBetween('date', [$request->date_start, $request->date_end])
+                    ->get();
+                // dd($opr);
+                foreach ($opr as $key => $b) {
+                    $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
+                    // dd($emp);
+                    $operator[] = array(
+                        'employee_nik' => $b->staff_loket_nik,
+                        'date' => $b->date
+                    );
+                }
+                if (!empty($b->date)) {
+                    $hari = $b->date;
+                } else {
+                    $hari = '';
+                }
+
+                $data[] = array(
+                    'wahana_name' => $a->wahana_name,
+                    'wahana_id' => $a->wahana_id,
+                    'date' => $hari
+                );
+            }
+            return view('report.wahana_report', compact('data'));
         }
     }
 }

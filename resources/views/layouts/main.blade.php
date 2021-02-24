@@ -16,11 +16,15 @@
     <!-- Custom styles for this template-->
     <link href="{{ asset('/css/sb-admin-2.min.css')}}" rel="stylesheet">
     <script src="{{asset('/js/qrcode.min.js')}}"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 </head>
 
 <body id="page-top">
     <script src="{{asset('/vendor/jquery/jquery.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <!-- Page Wrapper -->
     <div id="wrapper">
         @include('layouts.sidebar')

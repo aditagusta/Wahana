@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -15,3 +16,4 @@ Route::post('/registrasi', "API\VisitorApi@registrasi");
 Route::post('/edit-profil/{visitor_id?}', "API\VisitorApi@editProfil");
 Route::post('/historytopup', "API\TopupApi@store");
 Route::post('/transaction', "API\TransactionApi@store");
+Route::post('/operator', "ScheduleController@getopr");

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Print - Laporan Pembayaran</title>
+    <title>Print - Laporan Wahana</title>
     <link href="{{ asset('bootstrap.min.css')}}" rel="stylesheet">
 </head>
 
@@ -32,7 +32,7 @@
                         <br>
                         <center>
                             <h4><b><u>
-                                        Laporan Pembayaran
+                                        Laporan Wahana
                                     </u>
                                 </b></h4>
                         </center>
@@ -51,34 +51,49 @@
                             <th width="75px">
                                 <center>No</center>
                             </th>
-                            <th>Tiket</th>
-                            <th>Qty</th>
-                            <th>Total Pembayaran</th>
+                            <th>Nama Wahana</th>
+                            <th>Nama Staff Loket</th>
+                            <th>Nama Staff Operator</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                        $totalkeseluruhan = 0;
-                        @endphp
-                        @foreach ($data as $i => $pay)
-                        <?php $totalkeseluruhan += $pay['total_pay']; ?>
+                        @foreach ($data as $i => $item)
                         <tr>
-                            <th scope="row">
-                                <center>{{$i+1}}</center>
-                            </th>
-                            <td>{{$pay['wahana_name']}}</td>
-                            <td>{{$pay['total']}}</td>
-                            <td>{{number_format($pay['total_pay'])}}</td>
+                            <td>{{$i + 1}}</td>
+                            <td>{{$item['wahana_name']}}</td>
+                            <td>
+                                <?php
+                                        $sch = DB::table('schedule')
+                                                ->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')
+                                                ->whereBetween('schedule.date', [$_GET['date_start'], $_GET['date_end']])
+                                                ->where('wahana_id', $item['wahana_id'])
+                                                ->get();
+                                ?>
+
+                                <ul>
+                                    @foreach ($sch as $sc)
+                                    <li>{{$sc->employee_name}}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                            <td>
+                                <?php
+                                    $opr = DB::table('staff_operators')
+                                    ->join('employees', 'staff_operators.staff_operator_nik', 'employees.employee_nik')
+                                    ->whereBetween('staff_operators.date', [$_GET['date_start'], $_GET['date_end']])
+                                    ->where('wahana_id', $item['wahana_id'])
+                                    ->get();
+                            ?>
+                                <ul>
+                                    @foreach ($opr as $sc)
+                                    <li>{{$sc->employee_name}}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
                         </tr>
                         @endforeach
 
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3">Total</td>
-                            <td>{{number_format($totalkeseluruhan)}}</td>
-                        </tr>
-                    </tfoot>
                 </table>
                 <div class="row">
                     <div class="col-md-4 offset-8 mt-5">
