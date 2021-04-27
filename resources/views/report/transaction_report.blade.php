@@ -66,7 +66,7 @@
                         <td>{{$pay->transaction_id}}</td>
                         <td>{{$pay->transaction_date}}</td>
                         <td>{{$pay->visitor_name}}</td>
-                        <td>{{$pay->wahana_name}}</td>
+                        <td>{{$pay->wahana_id}}</td>
                         <td>{{$pay->qty}}</td>
                         <td>@currency($pay->total)</td>
                     </tr>

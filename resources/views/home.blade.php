@@ -83,9 +83,10 @@
                     </select>
                     <script>
                         document.getElementById("tahun").value = "{{ $year }}";
-                     document.getElementById("tahun").addEventListener("change", function(){
-                        window.location.href = "{{ url('home') }}?year=" + this.value;
-                     });
+                        document.getElementById("tahun").addEventListener("change", function () {
+                            window.location.href = "{{ url('home') }}?year=" + this.value;
+                        });
+
                     </script>
                 </div> --}}
 
@@ -101,7 +102,7 @@
                 </div>
                 <div class="col-sm-6">
                     <select name="" id="filterwahana" class="form-control">
-                        <option value="">-- Pilih Wahana --</option>
+                        <option value="0">-- Pilih Wahana --</option>
                         @foreach ($wahana as $datawahana)
                         <option value="{{$datawahana->wahana_id}}">{{$datawahana->wahana_name}}</option>
                         @endforeach
@@ -114,6 +115,7 @@
                         var wahana = $('#filterwahana').val()
                         window.location.href = "{{ url('home') }}?year=" + tahun + "&wahana=" + wahana;
                     });
+
                 </script>
             </div>
         </div>
@@ -142,9 +144,11 @@
                     <script>
                         document.getElementById("tahundonat").value = "{{ $yeard }}";
 
-                        document.getElementById("tahundonat").addEventListener("change", function(){
-                        window.location.href = "{{ url('home') }}?yeard=" + this.value;
+                        document.getElementById("tahundonat").addEventListener("change", function (e) {
+
+                            window.location.href = "{{ url('home') }}?yeard=" + this.value;
                         });
+
                     </script>
                 </div>
             </div>
@@ -168,82 +172,128 @@
     </div>
 </div>
 </div>
+<input type="hidden" name="whn" id="whn">
 <script src="{{asset('/vendor/jquery/jquery.min.js')}}"></script>
 <script>
-    $(document).ready(function () {
-      var transactions_year = <?=json_encode($transactions_report)?>;
-      console.log(transactions_year);
-      var labels = [];
-      var data = [];
-      var banyak_data = transactions_year.length;
+    $(document).ready(function (e) {
 
-      // ubah format data baris dan kolom dari variabel transaction_year agar sesuai dengan format sebaris pada
-      // chartks
-      for(var x = 0;  x < banyak_data; x++)
-      {
-         labels.push(transactions_year[x].bulan.substr(0, 3));
-         data.push(transactions_year[x].total);
-      }
+        var transactions_year = <?php echo json_encode($transactions_report) ?> ;
+        console.log(transactions_year);
+        var labels = [];
+        var data = [];
+        var banyak_data = transactions_year.length;
+        var c = [];
 
-      console.log(labels);
-      console.log(data);
 
-   new Chart(document.getElementById("line-chart"), {
-   type: 'line',
-   data: {
-      labels: labels,
-      datasets: [{
-                  data: data,
-                  label: "Total",
-                  borderColor: "#3e95cd",
-                  fill: false
-                  }
-               ]
-      },
-      options: {
-         legend: { display: false },
-         title: {
-         display: true,
-         text: 'Pendapatan Tahun : <?=$year?>',
-      }
-   }
-   });
-   });
+
+
+        @if(!empty($_GET))
+
+        var cek = "<?php echo $_GET['wahana'] ?>";
+
+        axios.get("{{url('/api/wahana')}}/" + cek)
+        .then(function(res){
+            var tes = res.data.data[0].wahana_name;
+
+                localStorage.setItem('data',tes)
+
+                c.push(tes)
+
+
+        });
+
+        setTimeout(() => {
+            console.log(c[0])
+        }, 5000);
+
+
+        @else
+            var wahana = "";
+            @endif
+            // console.log(wahana)
+            // ubah format data baris dan kolom dari variabel transaction_year agar sesuai dengan format sebaris pada
+            // chartks
+
+
+              setTimeout(() => {
+                var localData = localStorage.getItem('data') == null ? '-' : localStorage.getItem('data');
+
+
+            for (var x = 0; x < banyak_data; x++) {
+                labels.push(transactions_year[x].bulan.substr(0, 3));
+                data.push(transactions_year[x].total);
+            }
+
+
+
+            console.log(labels);
+            console.log(data);
+
+            new Chart(document.getElementById("line-chart"), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        label: "Total",
+                        borderColor: "#3e95cd",
+                        fill: false
+                    }]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: `Pendapatan Tahun : <?=$year?> - Wahana : ${localData}`,
+                    }
+                }
+            });
+
+
+              }, 5000);
+
+
+
+
+    });
+
 </script>
 <script>
     $(document).ready(function () {
-      var tiket_name = <?=json_encode($tiket_report)?>;
-      var labeld = [];
-      var datad = [];
-      var banyak_tiket = tiket_name.length;
-      var warna = randomColor({
-         luminosity: 'bright',
-         hue: 'random',
-         count: tiket_name.length
-      });
-      for(var x = 0; x < banyak_tiket; x++) {
-         labeld.push(tiket_name[x].wahana_id);
-         datad.push(tiket_name[x].total); }
-      new Chart(document.getElementById("doughnut-chart"), {
-      type: 'doughnut',
-      data: {
-      labels: labeld,
-      datasets: [
-      {
-      label: "Jumlah tiket",
-      backgroundColor: warna,
-      data: datad
-      }
-      ]
-      },
-      options: {
-      title: {
-      display: true,
-      text: 'Penjualan Tiket : <?=$yeard?>'
-      }
-      }
-      });
-   })
+        var tiket_name = <?php echo json_encode($tiket_report) ?> ;
+        var labeld = [];
+        var datad = [];
+        var banyak_tiket = tiket_name.length;
+        var warna = randomColor({
+            luminosity: 'bright',
+            hue: 'random',
+            count: tiket_name.length
+        });
+        for (var x = 0; x < banyak_tiket; x++) {
+            labeld.push(tiket_name[x].wahana_id);
+            datad.push(tiket_name[x].total);
+        }
+        new Chart(document.getElementById("doughnut-chart"), {
+            type: 'doughnut',
+            data: {
+                labels: labeld,
+                datasets: [{
+                    label: "Jumlah tiket",
+                    backgroundColor: warna,
+                    data: datad
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Penjualan Tiket : <?=$yeard?>'
+                }
+            }
+        });
+    })
+
 </script>
 
 @endsection

@@ -41,8 +41,7 @@
                 <br>
                 <div class="row mt-2 mb-2">
                     <div class="col-md-12">
-                        <b>Tanggal : {{ date('d F Y',strtotime(app('request')->input('date_start'))) }} -
-                            {{ date('d F Y',strtotime(app('request')->input('date_end'))) }}</b>
+                        <b>Tanggal : {{ date('d F Y',strtotime(app('request')->input('date_start'))) }}</b>
                     </div>
                 </div>
                 <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse">
@@ -65,7 +64,7 @@
                                 <?php
                                         $sch = DB::table('schedule')
                                                 ->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')
-                                                ->whereBetween('schedule.date', [$_GET['date_start'], $_GET['date_end']])
+                                                ->where('schedule.date', [$_GET['date_start']])
                                                 ->where('wahana_id', $item['wahana_id'])
                                                 ->get();
                                 ?>
@@ -80,7 +79,7 @@
                                 <?php
                                     $opr = DB::table('staff_operators')
                                     ->join('employees', 'staff_operators.staff_operator_nik', 'employees.employee_nik')
-                                    ->whereBetween('staff_operators.date', [$_GET['date_start'], $_GET['date_end']])
+                                    ->where('staff_operators.date', [$_GET['date_start']])
                                     ->where('wahana_id', $item['wahana_id'])
                                     ->get();
                             ?>

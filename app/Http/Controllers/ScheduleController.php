@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use DB;
 
 class ScheduleController extends Controller
@@ -16,7 +17,7 @@ class ScheduleController extends Controller
 
     public function index()
     {
-        $schedule = DB::table('schedule')->get();
+        $schedule = DB::table('schedule')->join('wahana', 'schedule.wahana_id', 'wahana.wahana_id')->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')->get();
         $operator = DB::table('employees')->where('id_position', 'KS8')->get();
         // dd($schedule);
         return view('schedule.index', compact(['schedule', 'operator']));
@@ -49,13 +50,32 @@ class ScheduleController extends Controller
         //     'staff_loket_nik' => $request->staff
         // ]);
 
-        $save = DB::table('schedule')->insert([
-            'date' => $request->tanggal,
-            'wahana_id' => $request->wahana,
-            'staff_loket_nik' => $request->staff
-        ]);
-        if ($save == TRUE) {
-            return redirect()->route('schedule')->with('Status', 'Data jadwal berhasil ditambahkan');
+        $cek_user = DB::table('schedule')
+            ->where('date', $request->tanggal)
+            ->where('staff_loket_nik', $request->staff_loket_nik)
+            ->get();
+
+        $cek_wahana = DB::table('schedule')
+            ->where('date', $request->tanggal)
+            ->where('wahana_id', $request->wahana)
+            ->get();
+
+        if (count($cek_user) == 0) {
+            if (count($cek_wahana) == 0) {
+                $save = DB::table('schedule')->insert([
+                    'date' => $request->tanggal,
+                    'wahana_id' => $request->wahana,
+                    'staff_loket_nik' => $request->staff_loket_nik
+                ]);
+                if ($save == TRUE) {
+                    return redirect()->route('schedule')->with('Status', 'Data jadwal berhasil ditambahkan');
+                }
+            } else {
+                return redirect()->route('create_schedule')->with('Status', 'Data jadwal sudah ada');
+            }
+            return redirect()->route('create_schedule')->with('Status', 'Data jadwal sudah ada');
+        } else {
+            return redirect()->route('create_schedule')->with('Status', 'Data jadwal sudah ada');
         }
     }
 
@@ -120,31 +140,50 @@ class ScheduleController extends Controller
         $wahana = $r->wahana_;
         $nama = $r->nama;
 
-        // dd($nama);
-        DB::table('staff_operators')
-            ->where('date', $date)
-            ->where('wahana_id', $wahana)
-            ->delete();
 
         if ($nama != null) {
+            // dd($nama);
+            DB::table('staff_operators')
+                ->where('date', $date)
+                ->where('wahana_id', $wahana)
+                ->delete();
+
+
             foreach ($nama as $no => $a) {
-                $cek = DB::table('staff_operators')
+                // cari apakah user tealah bekerja
+                $cek_user = DB::table('staff_operators')
                     ->where('date', $date)
+                    ->where('staff_operator_nik', $a)
+                    ->get();
+
+                $cek_wahana = DB::table('staff_operators')
                     ->where('wahana_id', $wahana)
                     ->where('staff_operator_nik', $a)
                     ->get();
 
-                if (count($cek) < 1) {
-                    $simpan = DB::statement("INSERT INTO `staff_operators`(`date`, `wahana_id`, `staff_operator_nik`) VALUES ('$date','$wahana','$a')");
+                // jika belum
+                if (count($cek_user) == 0) {
+                    if (count($cek_wahana) == 0) {
+                        // dd('ateh');
+                        $simpan = DB::statement("INSERT INTO `staff_operators`(`date`, `wahana_id`, `staff_operator_nik`) VALUES ('$date','$wahana','$a')");
+                    }
                 }
             }
+        } else {
+            DB::table('staff_operators')
+                ->where('date', $date)
+                ->where('wahana_id', $wahana)
+                ->delete();
+            return redirect()->route('schedule')->with('Status1 ', 'Data operator berhasil ditambahkan');
         }
+        return redirect()->route('schedule')->with('Status1 ', 'Data operator berhasil ditambahkan');
+
 
         // $nama = implode(',', $r->nama);
         // dd($nama);
         // dd($simpan);
         // if ($simpan == true) {
-        return redirect()->route('schedule')->with('Status', 'Data operator berhasil ditambahkan');
+
         // }
     }
     /**
@@ -160,10 +199,34 @@ class ScheduleController extends Controller
         $date = $req->tanggal;
         $wahana = $req->wahana;
         $staff = $req->staff;
-        $update = DB::statement("UPDATE `schedule` set `staff_loket_nik` = '$staff' where `date` = '$date' and `wahana_id` = '$wahana'");
-        // dd($update);
-        if ($update == TRUE) {
-            return redirect()->route('schedule')->with('Status', 'Data jadwal berhasil diubah');
+        // $update = DB::statement("UPDATE `schedule` set `staff_loket_nik` = '$staff' where `date` = '$date' and `wahana_id` = '$wahana'");
+        // // dd($update);
+        // if ($update == TRUE) {
+        //     return redirect()->route('schedule')->with('Status', 'Data jadwal berhasil diubah');
+        // }
+
+        $cek_user = DB::table('schedule')
+            ->where('date', $req->tanggal)
+            ->where('staff_loket_nik', $req->staff_loket_nik)
+            ->get();
+
+        $cek_wahana = DB::table('schedule')
+            ->where('date', $req->tanggal)
+            ->where('wahana_id', $req->wahana)
+            ->get();
+
+        if (count($cek_user) == 0) {
+            if (count($cek_wahana) == 0) {
+                $update = DB::statement("UPDATE `schedule` set `staff_loket_nik` = '$staff' where `date` = '$date' and `wahana_id` = '$wahana'");
+                if ($update == TRUE) {
+                    return redirect()->route('schedule')->with('Status', 'Data jadwal berhasil diubah');
+                }
+            } else {
+                return redirect()->route('schedule')->with('Status', 'Data jadwal sudah ada');
+            }
+            return redirect()->route('create_schedule')->with('Status', 'Data jadwal sudah ada');
+        } else {
+            return redirect()->route('create_schedule')->with('Status', 'Data jadwal sudah ada');
         }
     }
 

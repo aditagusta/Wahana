@@ -114,7 +114,9 @@
                                 'id_wahana': id_wahana
                             }).then(function(res) {
                                 var id = res.data
+                                console.log(id);
                                 toastr.info('On')
+                                window.location.reload()
                                 // toastr.info('Sukses.. Barang Di Set Tidak Laku')
                                 // $(".cek_menipis").prop("checked", true);
                             }).catch(function(err) {
@@ -127,6 +129,7 @@
                                 'id_wahana': id_wahana
                             }).then(function(res) {
                                 var data = res.data
+                                console.log(data);
                                 toastr.warning('Off')
                                 if(data.pesan == 'Logout')
                                 {

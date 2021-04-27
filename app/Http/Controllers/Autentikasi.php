@@ -24,7 +24,7 @@ class Autentikasi extends Controller
             $request->session()->put("username", $auth_check['data']->username);
             $request->session()->put("position_name", $auth_check['data']->position->position_name);
             $data = DB::table('wahana')->where('wahana_id', 'WS01')->first();
-            if (session('id_position') != "KS1") {
+            if (session('id_position') != "KS1" && session('id_postion') != "KS2") {
                 if ($data->status == 0) {
                     return redirect()->route('login')->with('Status', 'Program Sudah Tutup');
                 } else {

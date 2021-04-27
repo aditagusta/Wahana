@@ -59,15 +59,20 @@ class ReportController extends Controller
 
             // Query Baru
             $wahana = DB::table('wahana')->get();
+            // dd($request->date_start, $request->date_end);
             $data = array();
             foreach ($wahana as $i => $a) {
                 $trans = DB::table('transactions')
                     ->where('wahana_id', $a->wahana_id)
-                    ->selectRaw("COUNT(qty) as totqty")
+                    ->selectRaw("SUM(qty) as totqty")
                     ->selectRaw("SUM(total) as totpembayaran")
-                    ->whereBetween('transaction_date', [$request->date_start, $request->date_end])
+                    // ->whereBetween('transactions.transaction_date', [$request->date_start, $request->date_end])
+                    ->whereBetween(DB::raw('DATE(transactions.transaction_date)'), [$request->date_start, $request->date_end])
+                    // ->whereDate('transaction_date', '>=', $request->date_start)
+                    // ->whereDate('transaction_date', '<=', $request->date_end)
                     ->groupBy('wahana_id')
                     ->first();
+                // dd($trans);
                 if ($trans != '') {
                     $total = $trans->totqty;
                     $totpay = $trans->totpembayaran;
@@ -103,36 +108,50 @@ class ReportController extends Controller
         }
     }
 
+
     public function indexwahana(Request $request)
     {
         if ($request->type == 'search') {
-            $wahana = DB::table('wahana')->get();
             $data = array();
-            $operator = array();
-            foreach ($wahana as $key => $a) {
-                $opr = DB::table('schedule')
-                    ->where('wahana_id', $a->wahana_id)
-                    ->get();
-                foreach ($opr as $key => $b) {
-                    $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
-                    $operator[] = array(
-                        'employee_nik' => $b->staff_loket_nik,
-                        'date' => $b->date
-                    );
-                }
-
-                if (!empty($b->date)) {
-                    $hari = $b->date;
-                } else {
-                    $hari = '';
-                }
-
+            $schedule = DB::table('schedule')
+                ->leftJoin('wahana', 'schedule.wahana_id', 'wahana.wahana_id')
+                ->where('schedule.date', [$request->date_start])
+                ->get();
+            foreach ($schedule as $key => $a) {
                 $data[] = array(
                     'wahana_name' => $a->wahana_name,
                     'wahana_id' => $a->wahana_id,
-                    'date' => $hari
+                    'date' => $a->date
                 );
             }
+
+            // $wahana = DB::table('wahana')->get();
+            // $data = array();
+            // $operator = array();
+            // foreach ($wahana as $key => $a) {
+            //     $opr = DB::table('schedule')
+            //         ->where('wahana_id', $a->wahana_id)
+            //         ->get();
+            //     foreach ($opr as $key => $b) {
+            //         $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
+            //         $operator[] = array(
+            //             'employee_nik' => $b->staff_loket_nik,
+            //             'date' => $b->date
+            //         );
+            //     }
+
+            //     if (!empty($b->date)) {
+            //         $hari = $b->date;
+            //     } else {
+            //         $hari = '';
+            //     }
+
+            //     $data[] = array(
+            //         'wahana_name' => $a->wahana_name,
+            //         'wahana_id' => $a->wahana_id,
+            //         'date' => $hari
+            //     );
+            // }
 
             return view('report.wahana_report', compact('data'));
         } elseif ($request->type == 'print') {
@@ -142,7 +161,7 @@ class ReportController extends Controller
             foreach ($wahana as $key => $a) {
                 $opr = DB::table('schedule')
                     ->where('wahana_id', $a->wahana_id)
-                    ->whereBetween('date', [$request->date_start, $request->date_end])
+                    ->where('date', [$request->date_start])
                     ->get();
                 // dd($opr);
                 foreach ($opr as $key => $b) {
@@ -167,35 +186,18 @@ class ReportController extends Controller
             }
             return view('report.wahana_print', compact('data'));
         } else {
-            $wahana = DB::table('wahana')->get();
             $data = array();
-            $operator = array();
-            foreach ($wahana as $key => $a) {
-                $opr = DB::table('schedule')
-                    ->where('wahana_id', $a->wahana_id)
-                    ->whereBetween('date', [$request->date_start, $request->date_end])
-                    ->get();
-                // dd($opr);
-                foreach ($opr as $key => $b) {
-                    $emp = DB::table('employees')->where('employee_nik', $b->staff_loket_nik)->get();
-                    // dd($emp);
-                    $operator[] = array(
-                        'employee_nik' => $b->staff_loket_nik,
-                        'date' => $b->date
-                    );
-                }
-                if (!empty($b->date)) {
-                    $hari = $b->date;
-                } else {
-                    $hari = '';
-                }
-
+            $schedule = DB::table('schedule')
+                ->join('wahana', 'schedule.wahana_id', 'wahana.wahana_id')
+                ->get();
+            foreach ($schedule as $key => $a) {
                 $data[] = array(
                     'wahana_name' => $a->wahana_name,
                     'wahana_id' => $a->wahana_id,
-                    'date' => $hari
+                    'date' => $a->date
                 );
             }
+            // dd($data);
             return view('report.wahana_report', compact('data'));
         }
     }

@@ -44,8 +44,8 @@
                     <tr>
                         <td>{{$no+1}}</td>
                         <td>{{$item->date}}</td>
-                        <td>{{$item->wahana_id}}</td>
-                        <td>{{$item->staff_loket_nik}}</td>
+                        <td>{{$item->wahana_name}}</td>
+                        <td>{{$item->employee_name}}</td>
                         <td>
                             @php
                             $data_operator = DB::table('staff_operators')->leftJoin('employees',
@@ -61,27 +61,9 @@
                                 class="btn btn-sm btn-danger">Hapus</a> |
                             <a href="{{url('editschedule'. "/" . $item->date."/" . $item->wahana_id)}}"
                                 class="btn btn-sm btn-warning">Edit</a>
-                            <?php if($item->wahana_id == "WS01")
-                                {
-                            ?>
-                            |
+
                             <button type="button" class="btn btn-sm btn-success"
                                 onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
-                            <?php
-                            }elseif ($item->wahana_id == "WS02"){
-                            ?>
-                            |
-                            <button type="button" class="btn btn-sm btn-success"
-                                onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
-                            <?php
-                            }elseif ($item->wahana_id == "WS07"){
-                            ?>
-                            |
-                            <button type="button" class="btn btn-sm btn-success"
-                                onclick="tekan('{{$item->date}}','{{$item->wahana_id}}')">Tambah Operator</button>
-                            <?php
-                            }
-                            ?>
                         </td>
                     </tr>
                     <!-- Modal -->
@@ -174,14 +156,5 @@
             </table>
         </div>
     </div>
-    {{-- axios.post("{{url('/api/operator')}}",{
-    'date':date,
-    'wahana_id':id
-    }).then(function(res){
-    res.data.forEach(isi => {
-    var data = JSON.stringify(isi);
-    console.log(data)
-
-    }); --}}
 </div>
 @endsection

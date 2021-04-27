@@ -25,6 +25,35 @@
         integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    {{-- cek sataus wahana --}}
+
+    @if(session()->get('id_position') != 'KS1')
+
+    <script>
+        setInterval(() => {
+            console.log('1');
+            cek();
+        }, 1000);
+
+        function cek(){
+            var cek = <?php
+                        $cek = DB::table('wahana')->where('wahana_id', '=', 'WS01')->select('status')->first();
+                        echo $cek->status;
+                        ?>;
+
+            if(cek == 0){
+                window.location='/'
+            }
+
+        }
+
+    </script>
+
+    @endif
+
+
+
     <!-- Page Wrapper -->
     <div id="wrapper">
         @include('layouts.sidebar')
@@ -34,6 +63,14 @@
             <div id="content">
                 @include('layouts.topbar')
                 <!-- Begin Page Content -->
+                <?php if(session('id_position') == "KS1"){?>
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    @yield('heading')
+                    <!-- Content Row -->
+                    @yield('content')
+                </div>
+                <?php } else { ?>
                 <div class="container-fluid" id="jam_buka">
                     <!-- Page Heading -->
                     @yield('heading')
@@ -41,10 +78,10 @@
                     @yield('content')
                 </div>
                 <div id="jam_tutup">
-
                     <h1>Tutup</h1>
-
                 </div>
+                <?php } ?>
+
                 <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
@@ -68,7 +105,7 @@
     </a>
     <!-- Logout Modal-->
     <!-- Bootstrap core JavaScript-->
-    {{-- <script>
+    <script>
         $(document).ready(function () {
 
         function my_Clock() {
@@ -85,10 +122,10 @@
     my_Clock.prototype.update = function () {
         this.updateTime(1);
         // buka aplikasi jam 8 pagi
-        if(this.hours >= 8 && this.hours <= 11 ){
+        if(this.hours >= 9 && this.hours <= 24 ){
             // console.log('buka');
-            if(this.hours <= 11 && this.minutes <= 13){
-                // console.log('buka1');
+            if(this.hours <= 24 && this.minutes <= 59){
+                // console.log('buka');
                 $('#jam_buka').css('display', 'block');
                 $('#jam_tutup').css('display', 'none');
             }else{
@@ -101,7 +138,7 @@
             $('#jam_buka').css('display', 'none');
             $('#jam_tutup').css('display', 'block');
         }
-        console.log(this.hours + ":" + this.minutes + ":" + this.seconds);
+        // console.log(this.hours + ":" + this.minutes + ":" + this.seconds);
     };
     my_Clock.prototype.updateTime = function (secs) {
         this.seconds += secs;
@@ -121,7 +158,7 @@
     clock.run();
     });
 
-    </script> --}}
+    </script>
     <script src="{{ asset('/vendor/jquery/jquery.min.js')}}"></script>
     <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <!-- Core plugin JavaScript-->

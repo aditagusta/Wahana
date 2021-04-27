@@ -16,15 +16,9 @@
                 <form action="{{ route('wahana_report')}}" method="GET">
                     <div class="row">
                         <div class="col-md-2">
-                            <input type="date" name="date_start" value="{{ app('request')->input('date_start') }}"
-                                class="form-control date_start" required>
-                        </div>
-                        <div class="col-md-1 text-center mt-2">
-                            sampai
-                        </div>
-                        <div class="col-md-2">
-                            <input type="date" name="date_end" value="{{ app('request')->input('date_end') }}"
-                                class="form-control date_end" required>
+                            Pilih Tanggal : <input type="date" name="date_start"
+                                value="{{ app('request')->input('date_start') }}" class="form-control date_start"
+                                required>
                         </div>
                         <div class="col-md-4 text-left">
                             <button type="submit" id="Search" value="search" class="btn btn-info" name="type">
@@ -51,6 +45,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Hari</th>
                         <th>Wahana</th>
                         <th>Petugas Loket</th>
                         <th>Petugas Operator</th>
@@ -60,6 +55,7 @@
                     @foreach ($data as $no => $item)
                     <tr>
                         <td>{{$no +1}}</td>
+                        <td>{{$item['date']}}</td>
                         <td>{{$item['wahana_name']}}</td>
                         <td>
                             <?php
@@ -67,7 +63,7 @@
                                 if(isset($_GET['type'])){
                                     $sch = DB::table('schedule')
                                             ->join('employees', 'schedule.staff_loket_nik', 'employees.employee_nik')
-                                            ->whereBetween('schedule.date', [$_GET['date_start'], $_GET['date_end']])
+                                            ->where('schedule.date', [$_GET['date_start']])
                                             ->where('wahana_id', $item['wahana_id'])
                                             ->get();
                                 }else{
@@ -90,7 +86,7 @@
                                 {
                                     $opr = DB::table('staff_operators')
                                     ->join('employees', 'staff_operators.staff_operator_nik', 'employees.employee_nik')
-                                    ->whereBetween('staff_operators.date', [$_GET['date_start'], $_GET['date_end']])
+                                    ->where('staff_operators.date', [$_GET['date_start']])
                                     ->where('wahana_id', $item['wahana_id'])
                                     ->get();
                                 } else {
